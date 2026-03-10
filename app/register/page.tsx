@@ -43,7 +43,12 @@ const Registration: React.FC = () => {
             const result = await registration(data);
             if (result.success) {
                 toast.success("Registration successful!");
-                router.push("/login?registered=true");
+                // router.push("/login?registered=true");
+            if(data.role === 'employer'){
+                router.push("/employer-dashboard");
+            }else{
+                router.push("/dashboard");
+            }
             }
         } catch (err: any) {
             toast.error(err.message || "Registration failed");
