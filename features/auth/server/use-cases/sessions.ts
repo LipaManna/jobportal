@@ -28,7 +28,7 @@ const createUserSession = async ({
 }: CreateSessionData) => {
   const hashedToken = hashToken(token);
 
-  const result = await prisma.sessions.upsert({
+  const result = await prisma.session.upsert({
     where: {
       user_id: userId,
     },
@@ -81,8 +81,8 @@ export const createSessionAndSetCookies = async (
   });
 };
 
-const invalidateSession = async (id: string) => {
-  await prisma.sessions.delete({
+export const invalidateSession = async (id: string) => {
+  await prisma.session.delete({
     where: {
       session_id: id,
     },
@@ -92,7 +92,7 @@ const invalidateSession = async (id: string) => {
 export const validateSessionAndGetUser = async (session: string) => {
   const hashedToken = hashToken(session);
 
-  const sessionData = await prisma.sessions.findUnique({
+  const sessionData = await prisma.session.findUnique({
     where: {
       session_id: hashedToken,
     },
@@ -116,3 +116,4 @@ export const validateSessionAndGetUser = async (session: string) => {
  
   return sessionData.user;
 };
+

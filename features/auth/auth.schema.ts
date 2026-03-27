@@ -14,6 +14,7 @@ export const registerSchema = z.object({
     .trim()
     .min(3, "Username must be at least 3 characters long"),
   email: z
+    .string()
     .email("Please enter valid email address")
     .trim()
     .max(255, "Email must be at most 255 characters long")
@@ -45,7 +46,7 @@ export type RegisterWithConfirmSchema = z.infer<
 >;
 
 export const loginSchema = z.object({
-  email: z.email("Please enter a valid email address"),
+  email: z.string().email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
   rememberMe: z.boolean().optional(),
 });

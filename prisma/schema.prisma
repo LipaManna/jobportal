@@ -16,6 +16,27 @@ enum Role {
   admin
 }
 
+enum Marital_Status {
+  single
+  married
+  divorced
+  widowed
+}
+
+enum Gender {
+  male
+  female
+  other
+}
+
+enum Education {
+  high_school
+  diploma
+  bachelor
+  master
+  phd
+}
+
 model User {
   id                Int       @id @default(autoincrement())
   email             String    @unique
@@ -31,11 +52,13 @@ model User {
   deleted_at        DateTime?
   created_at        DateTime  @default(now())
   updated_at        DateTime  @updatedAt
-  session           sessions?
+  session           Session?
+  employer          Employer?
+  applicant         Applicant?
 }
 
 
-model sessions {
+model Session {
   id          Int      @id @default(autoincrement())
   user_id     Int      @unique
   user_agent  String?
@@ -45,5 +68,46 @@ model sessions {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Employer {
+  user_id Int @id
+  company_name String
+  company_logo_url String?
+  company_description String?
+  company_banner_image_url String?
+  org_type String?
+  company_website String?
+  company_phone String?
+  company_email String?
+  company_location String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  year_of_establishment Int?
+  employee_size String?
+  
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Applicant {
+  user_id Int @id
+  biography String
+  date_of_birth DateTime
+  nationality String?
+  marital_status Marital_Status
+  gender  Gender
+  experience String
+  education Education
+  website_url String?
+  location String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

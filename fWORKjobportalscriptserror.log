@@ -1,0 +1,20 @@
+
+node:internal/modules/run_main:122
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'f:\WORK\jobportal\WORKjobportalscriptsseed-users.ts' imported from F:\WORK\jobportal\
+    at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    at moduleResolve (node:internal/modules/esm/resolve:860:10)
+    at defaultResolve (node:internal/modules/esm/resolve:984:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///F:/WORK/jobportal/node_modules/tsx/dist/esm/index.mjs?1773844159946:2:3744)
+    at async resolveDirectory (file:///F:/WORK/jobportal/node_modules/tsx/dist/esm/index.mjs?1773844159946:2:4237)
+    at async resolve (file:///F:/WORK/jobportal/node_modules/tsx/dist/esm/index.mjs?1773844159946:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:748:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:240:24)
+    at async handleMessage (node:internal/modules/esm/worker:199:18) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///f:/WORK/jobportal/WORKjobportalscriptsseed-users.ts'
+}
+
+Node.js v22.15.1

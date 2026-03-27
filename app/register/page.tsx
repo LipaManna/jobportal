@@ -59,7 +59,7 @@ const Registration: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950">
+        <div className="min-h-screen flex bg-background text-foreground">
             {/* Left Side: Form Container */}
             <div className="w-full lg:w-1/2 flex flex-col p-8 lg:p-12">
                 <div className="w-full max-w-md mx-auto">
@@ -69,8 +69,8 @@ const Registration: React.FC = () => {
                 <div className="flex-1 flex items-center justify-center">
                     <div className="w-full max-w-md space-y-8 animate-in fade-in slide-in-from-left duration-700">
                         <div className="space-y-2">
-                            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Create an account</h1>
-                            <p className="text-slate-500 dark:text-slate-400 text-lg">Enter your details to register for Jobpilot</p>
+                            <h1 className="text-3xl font-bold tracking-tight">Create an account</h1>
+                            <p className="text-muted-foreground text-lg">Enter your details to register for Jobpilot</p>
                         </div>
 
                         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -201,7 +201,7 @@ const Registration: React.FC = () => {
                             </Button>
                         </form>
 
-                        <div className="text-center text-sm text-slate-500">
+                        <div className="text-center text-sm text-muted-foreground">
                             Already have an account?{" "}
                             <a href="/login" className="text-primary font-semibold hover:underline decoration-2 underline-offset-4">Login</a>
                         </div>

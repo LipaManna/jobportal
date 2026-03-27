@@ -8,7 +8,9 @@ import {
   loginSchema,
   LoginSchema,
 } from "../auth.schema";
-import { createSessionAndSetCookies } from "./use-cases/sessions";
+import { createSessionAndSetCookies, invalidateSession, validateSessionAndGetUser } from "./use-cases/sessions";
+import { cookies } from "next/headers";
+import crypto from "node:crypto";
 
 export async function registration(data: RegisterWithConfirmSchema) {
   const parsedData = registerWithConfirmSchema.safeParse(data);
@@ -39,16 +41,46 @@ export async function registration(data: RegisterWithConfirmSchema) {
   }
 
   try {
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        username,
-        password: hashedPassword,
-        role: role as any,
-      },
+    const user = await prisma.$transaction(async (tx) => {
+      // 1. Create the base user
+      const newUser = await tx.user.create({
+        data: {
+          name,
+          email,
+          username,
+          password: hashedPassword,
+          role: role as any,
+        },
+      });
+
+      // 2. Create the associated profile based on the role
+      if (role === "employer") {
+        await tx.employer.create({
+          data: {
+            user_id: newUser.id,
+            company_name: newUser.name, // Use user name as initial company name
+          },
+        });
+      } else if (role === "applicant") {
+        await tx.applicant.create({
+          data: {
+            user_id: newUser.id,
+            biography: "",
+            date_of_birth: new Date(),
+            marital_status: "single",
+            gender: "male",
+            experience: "0",
+            education: "bachelor",
+            location: "",
+          },
+        });
+      }
+
+      return newUser;
     });
-     await createSessionAndSetCookies(user.id)
+
+    // 3. Create session and set cookies (outside transaction as it involves headers)
+    await createSessionAndSetCookies(user.id);
 
     return { success: true, user };
   } catch (error: any) {
@@ -58,6 +90,16 @@ export async function registration(data: RegisterWithConfirmSchema) {
       error.message || "Something went wrong during registration",
     );
   }
+}
+
+export async function validateSession() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("session_token")?.value;
+  if(!session) {
+    throw new Error("No session found");
+  }
+  const user = await validateSessionAndGetUser(session);
+  return user;
 }
 
 export async function login(data: LoginSchema) {
@@ -84,9 +126,25 @@ export async function login(data: LoginSchema) {
 
     return {
       success: true,
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
     };
   } catch (error: any) {
     throw new Error(error.message || "Something went wrong during login");
   }
 }
+
+const hashToken = (token: string) => {
+  return crypto.createHash("sha256").update(token).digest("hex");
+};
+
+
+
+export const logout = async () => {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("session_token")?.value;
+  if(!session) {
+    throw new Error("No session found");
+  }
+  await invalidateSession(hashToken(session));
+  cookieStore.delete("session_token");
+};

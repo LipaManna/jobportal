@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -7,12 +7,13 @@ import { Checkbox } from "@/components/ui/checkbox"
 import Image from "next/image"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { Logo } from "@/components/Logo"
-import { login } from "@/features/auth/server/auth.actions"
+import { login, validateSession } from "@/features/auth/server/auth.actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { LoginSchema, loginSchema } from "@/features/auth/auth.schema"
+
 
 
 
@@ -33,6 +34,7 @@ const Login: React.FC = () => {
 
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [isCheckingSession, setIsCheckingSession] = useState(true)
     const router = useRouter()
 
 
@@ -41,8 +43,13 @@ const Login: React.FC = () => {
         try {
             const res = await login(data)
             if (res?.success) {
+                sessionStorage.setItem("user", JSON.stringify(res.user))
                 toast.success("Login successful")
-                router.push("/")
+                if (res.user.role === 'employer') {
+                    router.push("/employer-dashboard");
+                } else {
+                    router.push("/dashboard");
+                }
             }
         } catch (error: any) {
             toast.error(error.message || "Login failed")
@@ -52,8 +59,34 @@ const Login: React.FC = () => {
         }
     }
 
+    async function checkSession() {
+        try {
+            const user = await validateSession()
+            if (user) {
+                // const parsedUser = JSON.parse(user)
+                if (user.role === 'employer') {
+                    router.push("/employer-dashboard");
+                } else {
+                    router.push("/dashboard");
+                }
+            } else {
+                setIsCheckingSession(false);
+            }
+        } catch (error) {
+            setIsCheckingSession(false);
+        }
+    }
+
+    useEffect(() => {
+        checkSession()
+    }, [])
+
+    if (isCheckingSession) {
+        return null; // Render nothing while checking session
+    }
+
     return (
-        <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950">
+        <div className="min-h-screen flex bg-background text-foreground">
             {/* Left Side: Form Container */}
             <div className="w-full lg:w-1/2 flex flex-col p-8 lg:p-12">
                 <div className="w-full max-w-md mx-auto">
@@ -63,8 +96,8 @@ const Login: React.FC = () => {
                 <div className="flex-1 flex items-center justify-center">
                     <div className="w-full max-w-md space-y-8 animate-in fade-in slide-in-from-left duration-700">
                         <div className="space-y-2">
-                            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Welcome back</h1>
-                            <p className="text-slate-500 dark:text-slate-400 text-lg">Enter your credentials to access your Jobpilot account</p>
+                            <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
+                            <p className="text-muted-foreground text-lg">Enter your credentials to access your Jobpilot account</p>
                         </div>
 
                         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -122,7 +155,7 @@ const Login: React.FC = () => {
                                 />
                                 <label
                                     htmlFor="rememberMe"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-600 dark:text-slate-400 cursor-pointer"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-600 cursor-pointer"
                                 >
                                     Remember me for 30 days
                                 </label>
@@ -137,7 +170,7 @@ const Login: React.FC = () => {
                             </Button>
                         </form>
 
-                        <div className="text-center text-sm text-slate-500">
+                        <div className="text-center text-sm text-muted-foreground">
                             Don&apos;t have an account?{" "}
                             <a href="/register" className="text-primary font-semibold hover:underline decoration-2 underline-offset-4">Register now</a>
                         </div>
