@@ -19,14 +19,13 @@ export const getCurrentEmployer = async () => {
             }
         })
         
-        const isProfileCompleted = 
-        employer?.company_name &&
-        employer?.company_logo_url &&
-        employer?.company_description &&
-        employer?.org_type &&
-        employer?.company_location &&
-        employer?.year_of_establishment &&
-        employer?.employee_size;
+        const isProfileCompleted = Boolean(
+            employer?.company_name &&
+            employer?.company_description &&
+            employer?.org_type &&
+            employer?.year_of_establishment &&
+            employer?.employee_size
+        );
 
         return {...currentUser, isProfileCompleted, employerDetails:employer};
 }

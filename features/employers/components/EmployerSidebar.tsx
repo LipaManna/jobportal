@@ -1,8 +1,11 @@
 "use client"
 
 import { logout } from "@/features/auth/server/auth.actions";
+import { cn } from "@/lib/utils";
 import { LayoutDashboard, User, Plus, Briefcase, Bookmark, CreditCard, Building, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { URLPattern } from "next/server";
 const base = "/employer-dashboard"
 
 const navItems = [
@@ -48,6 +51,22 @@ const navItems = [
     }
 ]
 const EmployerSidebar = () => {
+    const pathname = usePathname();
+    function isLinkActive({
+        href,
+        pathname,
+        base = '/'
+    }:{
+        href: string;
+        pathname: string;
+        base?: string
+    }){
+        const normalizedHref = href.replace(/\/$/,"") || "";
+        const pattern = new URLPattern({
+            pathname: normalizedHref === base ? base : `${normalizedHref}{/*}?`
+        })
+        return pattern.test({pathname})
+    }
     return (
         <div className="w-64 bg-card border-r border-border fixed bottom-0 top-0">
             <div className="p-6">
@@ -60,7 +79,14 @@ const EmployerSidebar = () => {
                             const Icon = item.icon
                             return (
                                 <li key={item.name}>
-                                    <Link href={item.href || "#"} className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors hover:bg-accent hover:text-accent-foreground">
+                                    <Link href={item.href || "#"} className={cn(
+                                        "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors hover:text-primary hover:bg-gray-200",
+                                        isLinkActive({
+                                            href: item.href || "#",
+                                            pathname,
+                                            base: "/employer-dashboard"
+                                        }) && "text-primary bg-gray-200"
+                                        )}>
                                     <Icon className="h-4 w-4" />
                                         {item.name}
                                     </Link>

@@ -24,7 +24,7 @@ const EmployerProfileCompletionStatus = async () => {
         <ItemContent>
           <ItemTitle>Incomplete Profile</ItemTitle>
           <ItemDescription className="text-white">
-            You haven't completed your employer profile yet. Please complete your profile to post jobs and access all features.
+            You have not completed your employer profile yet. Please complete your profile to post jobs and access all features.
           </ItemDescription>
         </ItemContent>
         <ItemActions>

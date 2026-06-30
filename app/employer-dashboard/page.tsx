@@ -1,9 +1,16 @@
 import { getCurrentUser } from "@/features/auth/server/auth.queries"
+import { getCurrentEmployer } from "@/features/server/employers.queries"
+import { redirect } from "next/navigation"
 import EmployerStats from "@/features/employers/components/EmployerStats"
 import EmployerProfileCompletionStatus from "@/features/employers/components/EmployerProfileCompletionStatus"
 
 const page = async () => {
   const user = await getCurrentUser()
+  const currentEmployer = await getCurrentEmployer();
+
+  if(!currentEmployer?.isProfileCompleted){
+    redirect("/employer-dashboard/settings");
+  }
   return (
     <>
       <h1 className="text-2xl font-medium text-foreground">
